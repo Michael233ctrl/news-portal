@@ -1,4 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.filters import SearchFilter
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .mixins import BulkUpdateRouteMixin
 from .models import User, Post
@@ -14,6 +16,9 @@ class UserViewSet(ModelViewSet):
         instance.save()
 
 
-class PostViewSet(BulkUpdateRouteMixin):
+class PostViewSet(BulkUpdateRouteMixin, ModelViewSet):
     serializer_class = serializers.PostSerializer
     queryset = Post.objects.all()
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filter_fields = ['title', 'text', 'topic']
+    search_fields = ['title']

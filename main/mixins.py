@@ -1,11 +1,9 @@
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.serializers import Serializer
-from rest_framework.viewsets import ModelViewSet
 
 
-class BulkUpdateSerializerMixin(Serializer):
+class BulkUpdateSerializerMixin:
     """
     Mixin to be used with BulkUpdateListSerializer & BulkUpdateRouteMixin
     that adds the ID back to the internal value from the raw input data so
@@ -28,7 +26,7 @@ class BulkUpdateSerializerMixin(Serializer):
         return ret
 
 
-class BulkUpdateRouteMixin(ModelViewSet):
+class BulkUpdateRouteMixin:
     """
     Mixin that adds a `bulk_update` API route to a view set. To be used
     with BulkUpdateSerializerMixin & BulkUpdateListSerializer.

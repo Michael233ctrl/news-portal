@@ -1,16 +1,12 @@
-from rest_framework import serializers, generics
-
-from .mixins import BulkUpdateSerializerMixin
+from rest_framework import serializers
 from .models import User, Post
+from .mixins import BulkUpdateSerializerMixin
 
 
 class UserSerializer(serializers.ModelSerializer):
-    company = serializers.CharField(source='company_id.name')
-
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'telephone_number', 'company')
-        read_only_fields = ('id',)
+        fields = ('id', 'username', 'email', 'telephone_number', 'company_id')
 
 
 class BulkUpdateListSerializer(serializers.ListSerializer):
@@ -35,7 +31,6 @@ class BulkUpdateListSerializer(serializers.ListSerializer):
 
 class PostSerializer(BulkUpdateSerializerMixin, serializers.ModelSerializer):
     user = serializers.SerializerMethodField()
-    id = serializers.IntegerField()
 
     class Meta:
         model = Post
