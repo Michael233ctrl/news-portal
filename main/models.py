@@ -3,14 +3,19 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
+    CLIENT = 1
+    ADMIN = 2
+    SUPERUSER = 3
+
     USER_TYPES = [
-        (1, 'client'),
-        (2, 'admin'),
-        (3, 'superuser')
+        (CLIENT, 'client'),
+        (ADMIN, 'admin'),
+        (SUPERUSER, 'superuser')
     ]
+
     email = models.EmailField(unique=True)
     user_type = models.PositiveSmallIntegerField(choices=USER_TYPES, blank=True, null=True)
-    company_id = models.ForeignKey('Company', on_delete=models.CASCADE, null=True)
+    company_id = models.ForeignKey('Company', on_delete=models.CASCADE, related_name='users', null=True)
     avatar = models.ImageField(blank=True, null=True)
     telephone_number = models.CharField(max_length=50, blank=True, null=True)
 
@@ -31,7 +36,7 @@ class Company(models.Model):
 
 class Post(models.Model):
     title = models.CharField(max_length=250)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user')
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
     text = models.TextField()
     topic = models.CharField(max_length=250, blank=True, null=True)
 

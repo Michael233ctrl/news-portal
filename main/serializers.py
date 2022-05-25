@@ -1,12 +1,45 @@
+from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
-from .models import User, Post
+from .models import User, Post, Company
 from .mixins import BulkUpdateSerializerMixin
 
 
-class UserSerializer(serializers.ModelSerializer):
+class CreateUserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField()
+    email = serializers.CharField()
+    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    password2 = serializers.CharField(write_only=True, required=True)
+
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'telephone_number', 'company_id')
+        fields = ('username', 'email', 'password', 'password2')
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({"password": "Password fields didn't match."})
+
+        return attrs
+
+    def create(self, validated_data):
+        user = User.objects.create(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            password=validated_data['password'],
+            user_type=User.CLIENT,
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+
+        return user
+
+
+class UserSerializer(serializers.ModelSerializer):
+    company = serializers.CharField(source='company_id', read_only=True)
+    id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'telephone_number', 'company')
 
 
 class BulkUpdateListSerializer(serializers.ListSerializer):
@@ -30,13 +63,18 @@ class BulkUpdateListSerializer(serializers.ListSerializer):
 
 
 class PostSerializer(BulkUpdateSerializerMixin, serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
+    username = serializers.CharField(source='user_id', read_only=True)
+    user_company = serializers.CharField(source='user_id.company_id', read_only=True)
 
     class Meta:
         model = Post
-        fields = ('id', 'title', 'topic', 'text', 'user_id', 'user')
-        read_only_fields = ('id', 'user')
+        fields = ('id', 'title', 'topic', 'text', 'username', 'user_company')
         list_serializer_class = BulkUpdateListSerializer
 
-    def get_user(self, obj):
-        return [obj.user_id.username, obj.user_id.email]
+
+class CompanySerializer(serializers.ModelSerializer):
+    users = UserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Company
+        fields = ('name', 'url', 'users')
