@@ -1,14 +1,14 @@
 FROM python:3.9.5-alpine
 
-WORKDIR /dj_news_app
-
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+WORKDIR /dj_news_app
+
 RUN pip install --upgrade pip
 
-COPY ./requirements.txt ./requirements.txt
+COPY requirements.txt /dj_news_app/
 
 RUN pip install -r requirements.txt
 
-COPY . .
+COPY . /dj_news_app/

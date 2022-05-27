@@ -17,7 +17,7 @@ class RegUserView(CreateAPIView):
 
 class UserViewSet(ModelViewSet):
     serializer_class = serializers.UserSerializer
-    queryset = User.objects.select_related('company_id')
+    queryset = User.objects.filter(is_active=True).select_related('company_id')
     permission_classes = (IsOwner,)
 
     def get_permissions(self):
@@ -26,6 +26,9 @@ class UserViewSet(ModelViewSet):
         return super(UserViewSet, self).get_permissions()
 
     def perform_destroy(self, instance):
+        if self.request.user.is_superuser:
+            super(UserViewSet, self).perform_destroy(instance)
+            return
         instance.is_active = False
         instance.save()
 
