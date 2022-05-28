@@ -1,11 +1,14 @@
-from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import CreateAPIView
 from rest_framework.filters import SearchFilter
+from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .mixins import BulkUpdateRouteMixin
-from .models import User, Post, Company
+from .models import User, Post, Company, Like
 from . import serializers
 from .permissions import IsOwner, IsAuthorOrReadOnly, IsAdminUserOrReadOnly
 
@@ -49,6 +52,22 @@ class PostViewSet(BulkUpdateRouteMixin, ModelViewSet):
             queryset = Post.objects.filter(user_id__company_id__name=company)
 
         return queryset
+
+    @action(detail=True, methods=['get'], permission_classes=(IsAuthenticated,))
+    def like(self, request, pk=None):
+        post = self.get_object()
+        option = "like"
+        if Like.objects.filter(post=post, user=request.user):
+            option = "unlike"
+            post.set_reaction(request.user, option)
+            return Response({'message': "unlike"}, status=status.HTTP_200_OK)
+        try:
+            post.set_reaction(request.user, option)
+        except ValueError as e:
+            return Response({'message': f'{e}'}, status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(post)
+        return Response(serializer.data)
 
 
 class CompanyViewSet(ModelViewSet):

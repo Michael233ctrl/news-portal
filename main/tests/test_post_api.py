@@ -40,7 +40,7 @@ class PostApiTestCase(BaseTestCase):
     def test_bulk_update_posts(self):
         self.assertEqual('Title of post1', self.post1.title)
         self.assertEqual('Title of post2', self.post2.title)
-        url = f"{reverse('posts-list')}bulk_update/"
+        url = reverse('posts-list') + "bulk_update/"
         data = [
             {
                 "id": 1,
@@ -66,3 +66,9 @@ class PostApiTestCase(BaseTestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(1, Post.objects.count())
+
+    def test_like_posts(self):
+        url = reverse("posts-detail", args=(self.post1.pk,)) + 'like/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+

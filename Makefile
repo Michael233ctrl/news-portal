@@ -10,7 +10,10 @@ build:
 	docker-compose build
 
 migrate:
-	docker-compose run server python manage.py migrate
+	docker-compose run web python manage.py migrate
 
 user:
-	docker-compose run server python manage.py createsuperuser
+	docker-compose run web python manage.py createsuperuser
+
+tests:
+	docker-compose run web ./manage.py test main.tests

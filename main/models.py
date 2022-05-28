@@ -40,3 +40,29 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def get_total_likes(self):
+        return self.post_likes.user.count()
+
+    def set_reaction(self, user, option):
+        if not isinstance(user, User):
+            raise ValueError(f"{user} should be is an instance of model User")
+        try:
+            self.post_likes
+        except Post.post_likes.RelatedObjectDoesNotExist:
+            Like.objects.create(post=self)
+        if option == 'like':
+            self.post_likes.user.add(user)
+        elif option == 'unlike':
+            self.post_likes.user.remove(user)
+
+
+class Like(models.Model):
+    post = models.OneToOneField(Post, on_delete=models.CASCADE, related_name='post_likes')
+    user = models.ManyToManyField(User, related_name='likes_by_user')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.id}: {self.post}'
