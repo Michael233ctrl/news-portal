@@ -1,22 +1,11 @@
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from main.models import User
+from main.tests.test_base import BaseTestCase
 
 
-def get_token(user):
-    return str(RefreshToken.for_user(user).access_token)
-
-
-class UserApiTestCase(APITestCase):
-    def setUp(self) -> None:
-        self.superuser = User.objects.create(username='Mike', email='mike@email.com', is_superuser=True)
-        self.user = User.objects.create(username='John', email='john@email.com')
-
-        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + get_token(self.superuser))
-
+class UserApiTestCase(BaseTestCase):
     def test_jwt_token(self):
         sign_up_url = reverse("register")
         data = {
@@ -42,7 +31,7 @@ class UserApiTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_user_by_id(self):
-        url = reverse('users-detail', args=(self.superuser.pk,))
+        url = reverse('users-detail', args=(self.admin_user.pk,))
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -59,17 +48,17 @@ class UserApiTestCase(APITestCase):
         self.assertEqual(3, User.objects.count())
 
     def test_update_users(self):
-        self.assertEqual('Mike', self.superuser.username)
-        url = reverse('users-detail', args=(self.superuser.pk,))
+        self.assertEqual('Mike', self.admin_user.username)
+        url = reverse('users-detail', args=(self.admin_user.pk,))
         data = {"username": "Michael"}
         response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.superuser.refresh_from_db()
-        self.assertEqual('Michael', self.superuser.username)
+        self.admin_user.refresh_from_db()
+        self.assertEqual('Michael', self.admin_user.username)
 
-    def test_delete_users(self):
-        # self.assertEqual(2, User.objects.count())
-        url = reverse('users-detail', args=(self.superuser.pk,))
-        response = self.client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        # self.assertEqual(1, User.objects.count())
+    # def test_delete_users(self):
+    # self.assertEqual(2, User.objects.count())
+    # url = reverse('users-detail', args=(self.superuser.pk,))
+    # response = self.client.delete(url)
+    # self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+    # self.assertEqual(1, User.objects.count())

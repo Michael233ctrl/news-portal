@@ -55,9 +55,9 @@ class BulkUpdateListSerializer(serializers.ListSerializer):
             else:
                 ret.append(self.child.update(post, data))
 
-        for post_id, post in post_mapping.items():
-            if post_id not in data_mapping:
-                post.delete()
+        # for post_id, post in post_mapping.items():
+        #     if post_id not in data_mapping:
+        #         post.delete()
 
         return ret
 

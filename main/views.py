@@ -38,7 +38,7 @@ class PostViewSet(BulkUpdateRouteMixin, ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly)
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filter_fields = ['title', 'text', 'topic']
-
+    
     def perform_create(self, serializer):
         serializer.save(user_id=self.request.user)
 
