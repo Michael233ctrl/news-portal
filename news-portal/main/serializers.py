@@ -68,7 +68,7 @@ class PostSerializer(BulkUpdateSerializerMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ('id', 'title', 'topic', 'text', 'username', 'user_company')
+        fields = ('id', 'title', 'topic', 'text', 'image_file', 'username', 'user_company')
         list_serializer_class = BulkUpdateListSerializer
 
 

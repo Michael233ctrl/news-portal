@@ -12,6 +12,9 @@ build:
 migrate:
 	docker-compose run backend python manage.py migrate
 
+makemigrations:
+	docker-compose run backend ./manage.py makemigrations
+
 user:
 	docker-compose run backend python manage.py createsuperuser
 

@@ -1,3 +1,4 @@
+from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAdminUser, AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
@@ -41,7 +42,7 @@ class PostViewSet(BulkUpdateRouteMixin, ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly)
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filter_fields = ['title', 'text', 'topic']
-    
+
     def perform_create(self, serializer):
         serializer.save(user_id=self.request.user)
 

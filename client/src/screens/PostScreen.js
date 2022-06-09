@@ -9,7 +9,7 @@ function PostScreen() {
     const [post, setPost] = useState([])
     useEffect(() => {
         async function fetchPosts() {
-            const {data} = await axios.get(`/api/posts/${id}`)
+            const {data} = await axios.get(`http://127.0.0.1:8000/api/posts/${id}`)
             setPost(data)
         }
 
